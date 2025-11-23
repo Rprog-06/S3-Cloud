@@ -1,166 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cloud File Upload (Supabase)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud File Upload</title>
 
-  <style>
-   body {
-            background: #eef2f7;
+    <style>
+        body {
+            background:#eef3f8;
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            padding: 40px 10px;
         }
 
-        .wrapper {
-    width: 100%;
-    max-width: 520px;
-    margin: 120px auto 40px auto;   /* ⬅ pushes everything DOWN */
-    padding: 20px;
-}
-
-
-        .card {
+        .container {
+            max-width: 600px;
+            width: 100%;
             background: white;
             padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
         }
 
-        h1 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #1f2937;
-            line-height: 32px;
-        }
-
-        .upload-area {
-    border: 2px dashed #3b82f6;
-    padding: 35px 20px;    /* ⬅ increase area height */
-    border-radius: 10px;
-    margin: 40px 0;        /* ⬅ add more spacing so it doesn’t touch text */
-    cursor: pointer;
-    display: block;
-}
-
-
-        .upload-area p {
-            margin: 0;
-            font-size: 15px;
-            color: #444;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            margin-top: 10px;
-            border: none;
-            border-radius: 8px;
-            background: #3b82f6;
-            color: white;
-            font-size: 16px;
+        .drop-box {
+            border: 3px dashed #3b82f6;
+            padding: 40px 20px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: 0.3s ease;
+            margin: 20px 0;
         }
 
-        button:disabled {
-            background: #9ec3fc;
-            cursor: not-allowed;
+        .drop-box:hover {
+            background:#f0f6ff;
         }
 
-        .result-box {
-            margin-top: 22px;
-            padding: 15px;
-            background: #f0f7ff;
-            border-left: 4px solid #3b82f6;
-            border-radius: 10px;
-            display: none;
+        .btn {
+            background:#3b82f6;
+            color:white;
+            padding: 15px 20px;
+            border:none;
+            border-radius:8px;
+            width:100%;
+            cursor:pointer;
+            font-size: 18px;
+            margin-top: 20px;
         }
 
-        a {
-            color: #2563eb;
-            font-weight: bold;
-            text-decoration: none;
+        .btn:disabled {
+            background:#a7c4ff;
+            cursor:not-allowed;
+        }
+
+        #resultBox {
+            background:#eef3ff;
+            padding:20px;
+            margin-top:20px;
+            border-radius:10px;
+            border-left:4px solid #3b82f6;
+            display:none;
+            text-align:left;
             word-break: break-all;
         }
-  </style>
-
+    </style>
 </head>
 
 <body>
 
-  <div class="wrapper">
-    <div class="card">
-        <h1>☁ Cloud File Upload</h1>
+<div class="container">
 
-        <label class="upload-area" for="fileInput">
-            <p><b>Click to choose a file</b></p>
-            <p>Any file up to 5MB</p>
-        </label>
+    <h2>☁️ Cloud File Upload</h2>
 
-        <input type="file" id="fileInput" />
-
-        <button id="uploadBtn">Upload to Cloud</button>
-
-        <div id="resultBox" class="result-box">
-            <p><strong>Uploaded File URL:</strong></p>
-            <a id="fileUrl" target="_blank"></a>
-        </div>
+    <!-- CLICK BOX -->
+    <div class="drop-box" id="dropBox">
+        <p id="fileLabel"><strong>Click to choose a file</strong><br>Any file up to 5MB</p>
     </div>
+
+    <!-- HIDDEN FILE INPUT -->
+    <input type="file" id="fileInput" style="display:none;">
+
+    <!-- Upload Button -->
+    <button id="uploadBtn" class="btn">Upload to Cloud</button>
+
+    <!-- Output -->
+    <div id="resultBox">
+        <h3>Uploaded File URL:</h3>
+        <p id="fileUrl"></p>
+    </div>
+
 </div>
 
-  <script>
-    async function uploadFile() {
-      const fileInput = document.getElementById("fileInput");
-      if (!fileInput.files[0]) {
-        alert("Please select a file first.");
+<script>
+const dropBox = document.getElementById("dropBox");
+const fileInput = document.getElementById("fileInput");
+const uploadBtn = document.getElementById("uploadBtn");
+const fileLabel = document.getElementById("fileLabel");
+const resultBox = document.getElementById("resultBox");
+const fileUrl = document.getElementById("fileUrl");
+
+let selectedFile = null;
+
+// Open file chooser when clicking the box
+dropBox.addEventListener("click", () => fileInput.click());
+
+// Save selected file
+fileInput.addEventListener("change", () => {
+    selectedFile = fileInput.files[0];
+    if (selectedFile) {
+        fileLabel.innerHTML = `<strong>Selected:</strong> ${selectedFile.name}`;
+    }
+});
+
+// Upload file
+uploadBtn.addEventListener("click", async () => {
+
+    if (!selectedFile) {
+        alert("Please choose a file first.");
         return;
-      }
+    }
 
-      const formData = new FormData();
-      formData.append("file", fileInput.files[0]);
+    uploadBtn.textContent = "Uploading...";
+    uploadBtn.disabled = true;
 
-      document.querySelector(".upload-btn").innerText = "Uploading...";
-      document.querySelector(".upload-btn").disabled = true;
+    const formData = new FormData();
+    formData.append("file", selectedFile);
 
-      try {
-        const res = await fetch("https://s3-cloud-1.onrender.com/upload", {
-          method: "POST",
-          body: formData
+    try {
+        const res = await fetch("https://s3-cloud-api.onrender.com/upload", {
+            method: "POST",
+            body: formData,
         });
 
         const data = await res.json();
 
-        document.querySelector(".upload-btn").innerText = "Upload to Cloud";
-        document.querySelector(".upload-btn").disabled = false;
-
         if (data.success) {
-          document.getElementById("resultBox").style.display = "block";
-          document.getElementById("fileUrl").href = data.url;
-          document.getElementById("fileUrl").innerText = data.url;
+            resultBox.style.display = "block";
+            fileUrl.textContent = data.url;
         } else {
-          alert("Error: " + data.error);
+            alert("Upload failed: " + data.error);
         }
 
-      } catch (err) {
-        alert("Connection error: " + err.message);
-        document.querySelector(".upload-btn").innerText = "Upload to Cloud";
-        document.querySelector(".upload-btn").disabled = false;
-      }
+    } catch (err) {
+        alert("Network error: " + err.message);
     }
-  </script>
+
+    uploadBtn.textContent = "Upload to Cloud";
+    uploadBtn.disabled = false;
+});
+</script>
 
 </body>
-
 </html>
