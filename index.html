@@ -127,7 +127,7 @@ uploadBtn.addEventListener("click", async () => {
     formData.append("file", selectedFile);
 
     try {
-        const res = await fetch("https://s3-cloud-api.onrender.com/upload", {
+        const res = await fetch("https://s3-cloud-1.onrender.com/upload", {
             method: "POST",
             body: formData,
         });
