@@ -12,7 +12,7 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://s3-cloud-2.onrender.com",  // your deployed frontend
+      "https://s3-cloud-2.onrender.com/",  // your deployed frontend
       "http://localhost:5500",            // local testing
       "http://localhost:3000"             // optional
     ],
