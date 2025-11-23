@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud File Upload (Supabase)</title>
+
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 420px;
+      background: white;
+      padding: 35px;
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    .upload-box {
+      margin-top: 20px;
+      border: 2px dashed #3b82f6;
+      padding: 25px;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #eef4ff;
+      transition: 0.2s;
+    }
+
+    .upload-box:hover {
+      background: #e3ebff;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .upload-btn {
+      margin-top: 20px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+      transition: 0.2s;
+    }
+
+    .upload-btn:hover {
+      background: #2563eb;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #eef3ff;
+      border-left: 5px solid #3b82f6;
+      border-radius: 6px;
+      text-align: left;
+      word-break: break-all;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>☁ Cloud File Upload</h2>
+
+    <label class="upload-box" for="fileInput">
+      <strong>Click to choose a file</strong><br>
+      <small>Any file up to 5MB</small>
+    </label>
+
+    <input type="file" id="fileInput">
+
+    <button class="upload-btn" onclick="uploadFile()">Upload to Cloud</button>
+
+    <div id="resultBox" class="result" style="display: none;">
+      <h4>Uploaded File URL:</h4>
+      <a id="fileUrl" href="#" target="_blank"></a>
+    </div>
+  </div>
+
+  <script>
+    async function uploadFile() {
+      const fileInput = document.getElementById("fileInput");
+      if (!fileInput.files[0]) {
+        alert("Please select a file first.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      document.querySelector(".upload-btn").innerText = "Uploading...";
+      document.querySelector(".upload-btn").disabled = true;
+
+      try {
+        const res = await fetch("http://localhost:8080/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+
+        document.querySelector(".upload-btn").innerText = "Upload to Cloud";
+        document.querySelector(".upload-btn").disabled = false;
+
+        if (data.success) {
+          document.getElementById("resultBox").style.display = "block";
+          document.getElementById("fileUrl").href = data.url;
+          document.getElementById("fileUrl").innerText = data.url;
+        } else {
+          alert("Error: " + data.error);
+        }
+
+      } catch (err) {
+        alert("Connection error: " + err.message);
+        document.querySelector(".upload-btn").innerText = "Upload to Cloud";
+        document.querySelector(".upload-btn").disabled = false;
+      }
+    }
+  </script>
+
+</body>
+
+</html>
