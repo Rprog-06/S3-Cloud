@@ -21,6 +21,7 @@ app.use(
   })
 );
 app.get("/", (req, res) => {
+   res.setHeader("Access-Control-Allow-Origin", "*");
   res.send("Cloud File Upload Backend Running ✔");
 });
 const upload = multer({ storage: multer.memoryStorage() });
