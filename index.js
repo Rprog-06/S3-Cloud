@@ -9,7 +9,18 @@ console.log("URL:", process.env.SUPABASE_URL);
 console.log("SERVICE ROLE:", process.env.SUPABASE_SERVICE_ROLE ? "Loaded" : "NOT LOADED");
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://s3-cloud-2.onrender.com",  // your deployed frontend
+      "http://localhost:5500",            // local testing
+      "http://localhost:3000"             // optional
+    ],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"]
+  })
+);
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 const supabase = createClient(
