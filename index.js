@@ -9,18 +9,16 @@ console.log("URL:", process.env.SUPABASE_URL);
 console.log("SERVICE ROLE:", process.env.SUPABASE_SERVICE_ROLE ? "Loaded" : "NOT LOADED");
 
 const app = express();
-app.use(
-  cors({
-    origin: [
-      "https://s3-cloud-1.onrender.com",
-      "https://s3-cloud-psi.vercel.app",  // your deployed frontend
-      "http://localhost:5500",            // local testing
-      "http://localhost:3000"             // optional
-    ],
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"]
-  })
-);
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"],
+}));
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  next();
+});
+
 app.get("/", (req, res) => {
    res.setHeader("Access-Control-Allow-Origin", "*");
   res.send("Cloud File Upload Backend Running ✔");
