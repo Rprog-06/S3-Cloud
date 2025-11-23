@@ -20,7 +20,9 @@ app.use(
     allowedHeaders: ["Content-Type"]
   })
 );
-
+app.get("/", (req, res) => {
+  res.send("Cloud File Upload Backend Running ✔");
+});
 const upload = multer({ storage: multer.memoryStorage() });
 
 const supabase = createClient(
