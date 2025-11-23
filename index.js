@@ -12,7 +12,8 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://s3-cloud-1.onrender.com",  // your deployed frontend
+      "https://s3-cloud-1.onrender.com",
+      "https://s3-cloud-psi.vercel.app",  // your deployed frontend
       "http://localhost:5500",            // local testing
       "http://localhost:3000"             // optional
     ],
