@@ -136,7 +136,7 @@ uploadBtn.addEventListener("click", async () => {
 
         if (data.success) {
             resultBox.style.display = "block";
-            fileUrl.textContent = data.url;
+            fileUrl.innerHTML = `<a href="${data.url}" target="_blank">Open File</a>`;
         } else {
             alert("Upload failed: " + data.error);
         }
